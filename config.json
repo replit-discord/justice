@@ -1,0 +1,10 @@
+{
+  "bot": {
+    "commands_require_mention": false,
+    "commands_prefix": "]",
+    "plugins": [
+      "plugins.mod",
+      "plugins.help"
+    ]
+  }
+}
