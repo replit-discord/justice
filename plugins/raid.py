@@ -42,8 +42,9 @@ class RaidPlug(JusticePlugin):
     def show_raiders(self, event: CommandLevels):
         """List raiders
 
-        This all of the raiders that have been caught, so they can be processed. This command requires no arguments,
-        but will not work if the server isn't being raided (or we haven't detected a raid yet).
+        Lists all of the raiders that have been caught, so they can be processed. This command requires no arguments,
+        and will alert you if the server isn't actually being raided (so the people listed might not be doing anything
+        wrong.
         """
         embed = MessageEmbed()
         embed.title = "Possible Raiders: (Anti-Raid not triggered)" if not self.session.active_raid else "Raiders:"
