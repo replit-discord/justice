@@ -67,9 +67,11 @@ class MemberPool(Pool):
 
     def check_contents(self):
         severity = len(self.pool) // self.max_members
-        if all(member.user.avatar is None for member in self.pool):
-            severity += 2
         if len(self.pool) > self.max_members:
+
+            if all(member.user.avatar is None for member in self.pool):
+                severity += 2
+
             init_creation = creation_date(self.pool[0].id)
             for member in self.pool[1:]:
                 member_creation = creation_date(member.id)
@@ -86,6 +88,7 @@ class MemberPool(Pool):
             init_name = self.pool[0].user.username
             if all(member.user.username == init_name for member in self.pool):
                 severity += 6
+
         if severity != self.past_severity:
             self.past_severity = severity
             self.change_severity(severity)
@@ -103,15 +106,17 @@ class MessagePool(Pool):
 
     def check_contents(self):
         severity = len(self.pool) // self.max_messages
-        init_message = self.pool[0].content
-        if all(m.content == init_message for m in self.pool):
-            severity += 3
-        init_author = self.pool[0].author.id
-        if all(m.author.id == init_author for m in self.pool):
-            severity += 1
-        if severity > self.past_severity:
-            self.past_severity = severity
-            self.change_severity(severity)
+        if severity:
+
+            init_message = self.pool[0].content
+            if all(m.content == init_message for m in self.pool):
+                severity += 3
+            init_author = self.pool[0].author.id
+            if all(m.author.id == init_author for m in self.pool):
+                severity += 1
+            if severity > self.past_severity:
+                self.past_severity = severity
+                self.change_severity(severity)
 
 
 class Raider:

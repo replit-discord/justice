@@ -59,5 +59,57 @@ class RaidPlug(JusticePlugin):
             embed.description += "{0} - {1}\n".format(raider.mention, ". ".join(triggered))
         event.msg.reply(embed=embed)
 
+    @require(Permissions.ADMINISTRATOR)
+    @JusticePlugin.command("reset")
+    def reset_pools(self, event):
+        """Reset raid trigger
+
+        This command will empty all pools, storing messages and people. In addition to clearing data, it will disable
+        the raid alarm, and allow pools to start emptying again.
+        """
+        self.session.active_raid = False
+        self.msg_pool.pool.clear()
+        self.join_pool.pool.clear()
+        event.msg.add_reaction("👍")
+
+    @require(Permissions.ADMINISTRATOR)
+    @JusticePlugin.command("raid")
+    def raid_summary(self, event):
+        """View raid summary
+
+        This command will allow a moderator to view details about the raid. If there is not a raid it will still provide
+        information. Information includes severity, pool sizes, and a sample of content in the pools.
+        """
+        embed = MessageEmbed()
+        embed.color = 0x00FFFF
+        embed.title = "Under Raid: " if self.session.active_raid else "Raid Not Triggered"
+        if self.session.active_raid and self.session.severity < config.SEVERITY_TOLERANCE * 1.5:
+            embed.title += "Small"
+        elif self.session.active_raid and self.session.severity < config.SEVERITY_TOLERANCE * 2:
+            embed.title += "Medium"
+        elif self.session.active_raid:
+            embed.title += "Large"
+
+        desc = """
+        **Join Pool:** {joins}
+        **Message Pool:** {msgs}
+        **Severity / Tolerance:** {severity} / {tolerance}
+        **Joins Samples:**
+        \t{join_samples}
+        **Message Samples:**
+        \t{msg_samples}
+        """.lstrip()
+
+        embed.description = desc.format(
+            joins=len(self.join_pool.pool),
+            msgs=len(self.msg_pool.pool),
+            severity=self.session.severity,
+            tolerance=config.SEVERITY_TOLERANCE,
+            join_samples="\n\t".join("<@{0}>".format(r.id) for _, r in zip(range(5), self.join_pool.pool)),
+            msg_samples="\n\t".join("{0}: {1}".format(m.author.mention, m.content)
+                                    for _, m in zip(range(5), self.msg_pool.pool))
+        )
+        event.msg.reply(embed=embed)
+
 
 del JusticePlugin

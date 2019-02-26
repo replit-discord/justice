@@ -1,5 +1,6 @@
 # Justice
 Repl.it Discord security bot, ready to srop crime!
+![Justice Logo](https://cdn.discordapp.com/attachments/445724289552089089/549364593563009024/Justice_Discord_128x.png)
 
 ---
 
