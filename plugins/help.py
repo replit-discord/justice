@@ -35,7 +35,7 @@ class HelpPlug(JusticePlugin):
             event.msg.reply(embed=embed)
         elif name.title() == name:
             for plugin in self.bot.plugins.values():
-                if name in plugin.__doc__.lower():
+                if name.lower() in plugin.__doc__.lower():
                     break
             else:
                 return event.msg.reply("Sorry, but I could not find the category '{0}'".format(name))
