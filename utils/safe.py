@@ -20,7 +20,7 @@ class JusticePlugin(Plugin):
             if greenlet.exception.code == 403:  # Insufficient permissions
                 event.msg.reply("Sorry, but I cannot do that. Fix my permissions and try again.")
             elif greenlet.exception.code >= 500:   # Server error
-                event.smg.reply("Discord is having issues right now, try again later.")
+                event.msg.reply("Discord is having issues right now, try again later.")
             elif greenlet.exception.code >= 400:  # We did something bad
                 event.msg.reply("Appologies, we messed up, this will be recorded and fixed in the future.")
                 greenlet.get()

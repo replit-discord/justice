@@ -3,7 +3,7 @@ from utils.deco import require
 from utils.safe import JusticePlugin
 from utils.trap import MemberPool, MessagePool, RaidSession
 
-from disco.bot import CommandLevels
+from disco.bot.command import CommandEvent
 from disco.types.message import MessageEmbed
 from disco.types.permissions import Permissions
 
@@ -39,7 +39,7 @@ class RaidPlug(JusticePlugin):
 
     @require(Permissions.ADMINISTRATOR)
     @JusticePlugin.command("raiders")
-    def show_raiders(self, event: CommandLevels):
+    def show_raiders(self, event: CommandEvent):
         """List raiders
 
         Lists all of the raiders that have been caught, so they can be processed. This command requires no arguments,
@@ -61,7 +61,7 @@ class RaidPlug(JusticePlugin):
 
     @require(Permissions.ADMINISTRATOR)
     @JusticePlugin.command("reset")
-    def reset_pools(self, event):
+    def reset_pools(self, event: CommandEvent):
         """Reset raid trigger
 
         This command will empty all pools, storing messages and people. In addition to clearing data, it will disable
@@ -74,7 +74,7 @@ class RaidPlug(JusticePlugin):
 
     @require(Permissions.ADMINISTRATOR)
     @JusticePlugin.command("raid")
-    def raid_summary(self, event):
+    def raid_summary(self, event: CommandEvent):
         """View raid summary
 
         This command will allow a moderator to view details about the raid. If there is not a raid it will still provide

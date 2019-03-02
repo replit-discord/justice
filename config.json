@@ -5,7 +5,8 @@
     "plugins": [
       "plugins.mod",
       "plugins.help",
-      "plugins.raid"
+      "plugins.raid",
+      "plugins.watch"
     ]
   }
 }
