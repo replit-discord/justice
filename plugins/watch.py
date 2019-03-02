@@ -55,7 +55,7 @@ class WatchPlug(JusticePlugin):
         event.msg.add_reaction("👍")
         new_channel.send_message("Watching {0} | Requested by {1}".format(member.mention, event.author.mention))
 
-    def unwatch(self, select_channel_id: int, delete: bool=True):
+    def unwatch(self, select_channel_id: int, delete: bool = True):
         watching_data = self.bot.storage["WATCHING"].data
         for user_id, channel_id in watching_data.items():
             if channel_id == select_channel_id:
@@ -78,7 +78,8 @@ class WatchPlug(JusticePlugin):
         """Remove watcher from user
 
         You must use this command in a channel that's being used to watch someone. It will clear the cache and stop
-        looking for their messages. It will also then delete that channel.
+        looking for their messages. It will also then delete that channel. If you delete the watching channel, the same
+        effect will happen, this is simply for convenience.
         """
         if not self.unwatch(event.msg.channel_id):
             event.msg.reply("Sorry, not this channel is nt being used to watch someone")
@@ -109,3 +110,6 @@ class WatchPlug(JusticePlugin):
                                               member.user, self.msg_cache[msg_data.id]["content"])
             self.client.api.channels_messages_create(watching_data[str(self.msg_cache[msg_data.id]["user"])],
                                                      embed=del_msg_embed)
+
+
+del JusticePlugin
