@@ -19,7 +19,6 @@ class ModPlug(JusticePlugin):
         mute_records = self.bot.storage["MUTES"].data
         for member_id, details in mute_records.items():
             to_finish = (details["start"] + details["length"]) - int(t.time())
-            print("Umute", member_id, to_finish)
             spawn(self.unmute, member_id, to_finish)
 
     @require(Permissions.KICK_MEMBERS)
@@ -64,19 +63,12 @@ class ModPlug(JusticePlugin):
 
     def unmute(self, member_id: int, sleep_delay: int):
         sleep(sleep_delay)
-        channels = self.client.api.guilds_channels_list(config.GUILD_ID)
-        for channel in channels.values():
-            overwrite = channel.overwrites.get(int(member_id))
-            if overwrite:
-                overwrite.deny.value &= ~Permissions.SEND_MESSAGES.value
-                overwrite.deny.value &= ~0x00000040
-                if overwrite.allow.value == 0 and overwrite.deny.value == 0:
-                    overwrite.delete()
-                else:
-                    overwrite.save()
-        del self.bot.storage["MUTES"].data[member_id]
+        if str(member_id) in self.bot.storage['MUTES'].data:
+            del self.bot.storage["MUTES"].data[str(member_id)]
+        member = self.client.api.guilds_members_get(config.GUILD_ID, member_id)
+        member.remove_role(config.MUTE_ROLE_ID)
 
-    @require(Permissions.MANAGE_CHANNELS)
+    @require(Permissions.MANAGE_ROLES)
     @parse_member
     @JusticePlugin.command("silence", "<member:str> [time:str...]")
     def mute_user(self, event: CommandEvent, member: GuildMember, time: str = None):
@@ -106,15 +98,12 @@ class ModPlug(JusticePlugin):
                 }
                 spawn(self.unmute, member.id, total_time)
 
-        for channel in event.guild.channels.values():
-            everyone_ow = channel.overwrites.get(channel.guild_id)
-            if everyone_ow and not everyone_ow.deny.value & Permissions.SEND_MESSAGES.value:
-                channel.create_overwrite(member, deny=0x00000840)
+        member.add_role(config.MUTE_ROLE_ID)
         event.msg.add_reaction("👍")
 
-    @require(Permissions.MANAGE_CHANNELS)
+    @require(Permissions.MANAGE_ROLES)
     @parse_member
-    @JusticePlugin.command("unmute", "<member:str>")
+    @JusticePlugin.command("unsilence", "<member:str>")
     def unmute_user(self, event: CommandEvent, member: GuildMember):
         """Unslience a member
 
@@ -127,7 +116,7 @@ class ModPlug(JusticePlugin):
         `]unmute BadUser5456#0001` (Mute user from name + discriminator)
         """
         self.unmute(member.id, 0)
-        event.msg.reply("👍")
+        event.msg.add_reaction("👍")
 
 
 del JusticePlugin  # We don't want disco to load this plugin

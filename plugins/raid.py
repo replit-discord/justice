@@ -111,5 +111,35 @@ class RaidPlug(JusticePlugin):
         )
         event.msg.reply(embed=embed)
 
+    @require(Permissions.ADMINISTRATOR)
+    @JusticePlugin.command("lockdown")
+    def lockdown_guild(self, event: CommandEvent):
+        """Put all action on the guild to a halt
+
+        The command will replace the current everyone role permissions with just being able to view channels. This does
+        not effect mods, and others with admin privileges. It will also not stop helpers from posting in helper
+        specific channels. Of course, this command should only be used when the server is being raided, or something
+        serious like that. In addition, it will delete all invites, to prevent more raiders from joining.
+        """
+        everyone_role = event.guild.roles[config.GUILD_ID]
+        lockdown_data = self.bot.storage["LOCKDOWN"].data
+        lockdown_data[config.GUILD_ID] = everyone_role.permissions.value
+        everyone_role.update(permissions=Permissions.READ_MESSAGES.value | Permissions.READ_MESSAGE_HISTORY.value)
+        invites = self.client.api.guilds_invites_list(config.GUILD_ID)
+        for invite in invites:
+            invite.delete()
+
+    @require(Permissions.ADMINISTRATOR)
+    @JusticePlugin.command("release")
+    def release_guild(self, event: CommandEvent):
+        """Unlock the guild
+
+        This command is used to reverse the changes made by lockdown command. Keep in mind, it will not make an invite,
+        you'll need to do that yourself. Use this command once the raiders have been dealt with.
+        """
+        everyone_role = event.guild.roles[config.GUILD_ID]
+        lockdown_data = self.bot.storage["LOCKDOWN"].data
+        everyone_role.update(permissions=lockdown_data[str(everyone_role.id)])
+
 
 del JusticePlugin
